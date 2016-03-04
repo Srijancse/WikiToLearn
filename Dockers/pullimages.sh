@@ -9,6 +9,17 @@ if [[ ! -f instance_config.conf ]] ; then
 fi
 . ./instance_config.conf
 
-for img in $W2L_DOCKER_MEMCACHED $W2L_DOCKER_MYSQL $W2L_DOCKER_OCG $W2L_DOCKER_WEBSRV $W2L_DOCKER_HAPROXY $W2L_DOCKER_PARSOID $W2L_DOCKER_MATHOID ; do
+W2L_DOCKER_OCG_USE="$W2L_DOCKER_OCG"
+
+if [[ "$W2L_SKIP_OCG_DOCKER" == "1" ]] ; then
+ W2L_DOCKER_OCG_USE=""
+fi
+
+for img in $W2L_DOCKER_MEMCACHED $W2L_DOCKER_MYSQL $W2L_DOCKER_OCG_USE $W2L_DOCKER_WEBSRV $W2L_DOCKER_HAPROXY $W2L_DOCKER_PARSOID $W2L_DOCKER_MATHOID ; do
  docker pull $img
+ docker inspect $img &> /dev/null
+ if [[ $? -ne 0 ]] ; then
+  echo "Error downloading the "$img" image, run again the script"
+  exit 1
+ fi
 done
